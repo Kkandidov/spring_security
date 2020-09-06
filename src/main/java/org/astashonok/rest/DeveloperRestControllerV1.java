@@ -32,4 +32,15 @@ public class DeveloperRestControllerV1 {
                 .findFirst()
                 .orElse(null);
     }
+
+    @PostMapping
+    public Developer create(@RequestBody Developer developer){
+        this.developers.add(developer);
+        return developer;
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable long id){
+        this.developers.removeIf(developer -> developer.getId() == id);
+    }
 }

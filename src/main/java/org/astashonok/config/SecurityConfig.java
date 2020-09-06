@@ -1,8 +1,10 @@
 package org.astashonok.config;
 
+import org.astashonok.model.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -24,13 +26,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .withUser("user")
                 .password(passwordEncoder.encode("user"))
-                .roles("USER")
+                .roles(Role.USER.name())
 
                 .and()
 
                 .withUser("admin")
                 .password(passwordEncoder.encode("admin"))
-                .roles("USER", "ADMIN")
+                .roles(Role.USER.name(), Role.ADMIN.name())
         ;
     }
 
@@ -45,11 +47,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/login")
                 .permitAll()
 
-                .antMatchers("/admin/**")
-                .hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST, "/api/**")
+                .hasRole(Role.ADMIN.name())
 
-                .antMatchers("/**")
-                .hasAnyRole("ADMIN", "USER")
+                .antMatchers(HttpMethod.DELETE, "/api/**")
+                .hasRole(Role.ADMIN.name())
+
+                .antMatchers(HttpMethod.GET, "/api/**")
+                .hasAnyRole(Role.USER.name(), Role.ADMIN.name())
 
                 .and()
                 .formLogin()
