@@ -33,8 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .withUser("admin")
                 .password(passwordEncoder.encode("admin"))
-                .authorities(Role.ADMIN.getGrantedAuthorities())
-        ;
+                .authorities(Role.ADMIN.getGrantedAuthorities());
     }
 
     @Bean
@@ -48,22 +47,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/login")
                 .permitAll()
 
-                .antMatchers(HttpMethod.POST, "/api/**")
-                .hasAuthority(Permission.WRITE.getPermission())
-
-                .antMatchers(HttpMethod.DELETE, "/api/**")
-                .hasAuthority(Permission.WRITE.getPermission())
-
-                .antMatchers(HttpMethod.GET, "/api/**")
-                .hasAnyAuthority(Permission.READ.getPermission(), Permission.WRITE.getPermission())
+                .antMatchers(HttpMethod.POST, "/api/**").hasAuthority(Permission.WRITE.getPermission())
+                .antMatchers(HttpMethod.DELETE, "/api/**").hasAuthority(Permission.WRITE.getPermission())
+                .antMatchers(HttpMethod.GET, "/api/**").hasAnyAuthority(Permission.READ.getPermission(), Permission.WRITE.getPermission())
 
                 .and()
                 .formLogin()
+                .loginPage("/auth/login")
+                .usernameParameter("j_login")
+                .passwordParameter("j_password")
+                .permitAll()
+                .defaultSuccessUrl("/auth/success")
 
                 .and()
                 .logout()
-                .logoutSuccessUrl("/login")
-                .permitAll()
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .deleteCookies("JSESSIONID")
+                .logoutSuccessUrl("/auth/login")
 
                 .and()
                 .csrf()
