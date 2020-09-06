@@ -1,5 +1,6 @@
 package org.astashonok.config;
 
+import org.astashonok.model.Permission;
 import org.astashonok.model.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -26,13 +27,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .withUser("user")
                 .password(passwordEncoder.encode("user"))
-                .roles(Role.USER.name())
+                .authorities(Role.USER.getGrantedAuthorities())
 
                 .and()
 
                 .withUser("admin")
                 .password(passwordEncoder.encode("admin"))
-                .roles(Role.USER.name(), Role.ADMIN.name())
+                .authorities(Role.ADMIN.getGrantedAuthorities())
         ;
     }
 
@@ -48,13 +49,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
 
                 .antMatchers(HttpMethod.POST, "/api/**")
-                .hasRole(Role.ADMIN.name())
+                .hasAuthority(Permission.WRITE.getPermission())
 
                 .antMatchers(HttpMethod.DELETE, "/api/**")
-                .hasRole(Role.ADMIN.name())
+                .hasAuthority(Permission.WRITE.getPermission())
 
                 .antMatchers(HttpMethod.GET, "/api/**")
-                .hasAnyRole(Role.USER.name(), Role.ADMIN.name())
+                .hasAnyAuthority(Permission.READ.getPermission(), Permission.WRITE.getPermission())
 
                 .and()
                 .formLogin()
